@@ -23,5 +23,11 @@ class ViewController: UIViewController{
         // Dispose of any resources that can be recreated.
     }
 
+    @IBAction func pressedStart(_ sender: UIButton) {
+        let quizStoryboard = UIStoryboard(name: "QuizView", bundle: .main)
+        if let quizVC = quizStoryboard.instantiateViewController(withIdentifier: "QuizView") as? QuizViewController {
+            self.present(quizVC, animated: true, completion: nil)
+        }
+    }
 }
 

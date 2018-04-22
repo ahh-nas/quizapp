@@ -13,7 +13,7 @@
         <!--Quiz View Controller-->
         <scene sceneID="DSK-vf-X5b">
             <objects>
-                <viewController id="OM9-de-JN2" customClass="QuizViewController" customModule="Quiz_App" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="QuizView" useStoryboardIdentifierAsRestorationIdentifier="YES" id="OM9-de-JN2" customClass="QuizViewController" customModule="Quiz_App" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="SIT-8H-CbI">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
