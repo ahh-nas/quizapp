@@ -11,16 +11,46 @@ import UIKit
 class QuizViewController: UIViewController {
     
     //the json file url
-    let QUIZ_URL = "http://www.people.vcu.edu/~ebulut/jsonFiles/quiz1.json";
-    
-    //A string array to save all the names
-    //var nameArray = [String]()
+    let QUIZ_URL = "http://www.people.vcu.edu/~ebulut/jsonFiles/quiz1.json"
+    var questionArray = [Question]()
+    var totalQuestions = 0
+    var currentQuestion = 0
 
+    // UI variables
+    @IBOutlet weak var currentQuestionNumberLabel: UILabel!
+    @IBOutlet weak var totalQuestionLabel: UILabel!
+    
+    @IBOutlet weak var questionLabel: UILabel!
+    @IBOutlet weak var answerLabel_A: UILabel!
+    @IBOutlet weak var answerLabel_B: UILabel!
+    @IBOutlet weak var answerLabel_C: UILabel!
+    @IBOutlet weak var answerLabel_D: UILabel!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         getJsonFromUrl()
+        answerLabel_A.isUserInteractionEnabled = true
+        
+        answerLabel_B.isUserInteractionEnabled = true
+        answerLabel_C.isUserInteractionEnabled = true
+        answerLabel_D.isUserInteractionEnabled = true
+        
+        //add tap gesture to answer labels
+            // single tap selects answer
+            // double tap submits answer if one is selected
+        
+        //selected answer variable
+        
+        // need way to determine when all players have submited answer
+            // when all players submit answer move to next question
+        
+        // add timer to the screen
+            // every 20 seconds move to the next question (restart timer)
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -31,48 +61,60 @@ class QuizViewController: UIViewController {
     
     //this function is fetching the json from URL
     func getJsonFromUrl(){
-        //creating a NSURL
-        let url = NSURL(string: QUIZ_URL)
+    let url = URL(string: QUIZ_URL)
+       
+    URLSession.shared.dataTask(with:url!, completionHandler: {(data, response, error) in
+        guard let data = data, error == nil else { return }
         
-        //fetching the data from the url
-        URLSession.shared.dataTask(with: (url as? URL)!, completionHandler: {(data, response, error) -> Void in
+        do {
+            let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:Any]
+            self.totalQuestions = json["numberOfQuestions"] as! Int
+            let dictionary = json["questions"] as? [[String: Any]] ?? []
+            self.parseDictionary(dictionary: dictionary)
+            print("total questions = \(self.totalQuestions)")
+            print(dictionary)
+            self.updateQuestion()
+        } catch let error as NSError {
+            print(error)
+        }
+    }).resume()
+    }
+    
+    func parseDictionary(dictionary : [[String: Any]]){
+        // for each element in dictionary create a question
+        
+        for question in dictionary{
+            let newQuestion = Question(number: question["number"] as! Int, correctOption: question["correctOption"] as! String, questionSentence: question["questionSentence"] as! String, options: question["options"] as! [String: Any])
+            questionArray.append(newQuestion)
+        }
+        
+    }
+     struct Question {
+        let number: Int
+        let correctOption : String
+        let questionSentence : String
+        let options : [String: Any]
+     }
+    
+    func updateQuestion(){
+        DispatchQueue.main.async {
+            if !self.questionArray.isEmpty {
+                self.questionLabel.text = (self.questionArray[self.currentQuestion].questionSentence)
+                self.currentQuestionNumberLabel.text = "\(self.questionArray[self.currentQuestion].number)"
+                self.totalQuestionLabel.text = "\(self.totalQuestions)"
             
-            if let jsonObj = try? JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? NSDictionary {
-                
-                //printing the json in console
-                print(jsonObj!.value(forKey: "questions")!)
-                print(jsonObj?.value(forKey: "numberOfQuestions"))
-            }}
-    )}
-
-
-//
-//                //getting the avengers tag array from json and converting it to NSArray
-//                if let heroeArray = jsonObj!.value(forKey: "avengers") as? NSArray {
-//                    //looping through all the elements
-//                    for heroe in heroeArray{
-//
-//                        //converting the element to a dictionary
-//                        if let heroeDict = heroe as? NSDictionary {
-//
-//                            //getting the name from the dictionary
-//                            if let name = heroeDict.value(forKey: "name") {
-//
-//                                //adding the name to the array
-//                                self.nameArray.append((name as? String)!)
-//                            }
-//
-//                        }
-//                    }
-//                }
-//
-//                OperationQueue.main.addOperation({
-//                    //calling another function after fetching the json
-//                    //it will show the names to label
-//                    self.showNames()
-//                })
-//            }
-
+                self.self.answerLabel_A.text = self.questionArray[self.currentQuestion].options["A"] as? String
+                self.self.answerLabel_B.text = self.questionArray[self.currentQuestion].options["B"] as? String
+                self.answerLabel_C.text = self.questionArray[self.currentQuestion].options["C"] as? String
+                self.answerLabel_D.text = self.questionArray[self.currentQuestion].options["D"] as? String
+            }else{
+                print("No questions available")
+            }
+        }
+    }
+    
+    
+    
     /*
     // MARK: - Navigation
 
@@ -82,5 +124,5 @@ class QuizViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
-
+    
 }
