@@ -47,11 +47,11 @@ class ConnectionManager : NSObject
     {
         
         func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
-            NSLog("%@", "didNotStartAdvertisingPeer: \(error)")
+            print("%@", "didNotStartAdvertisingPeer: \(error)")
         }
         
         func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-            NSLog("%@", "didReceiveInvitationFromPeer \(peerID)")
+            print("%@", "didReceiveInvitationFromPeer \(peerID)")
             invitationHandler(true, self.session)
         }
         
@@ -61,40 +61,40 @@ class ConnectionManager : NSObject
     {
     
         func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
-        NSLog("%@", "didNotStartBrowsingForPeers: \(error)")
+        print("%@", "didNotStartBrowsingForPeers: \(error)")
         }
     
         func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-        NSLog("%@", "foundPeer: \(peerID)")
-        NSLog("%@", "invitePeer: \(peerID)")
+        print("%@", "foundPeer: \(peerID)")
+        print("%@", "invitePeer: \(peerID)")
         browser.invitePeer(peerID, to: self.session, withContext: nil, timeout: 10)
         }
     
         func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
-        NSLog("%@", "lostPeer: \(peerID)")
+        print("%@", "lostPeer: \(peerID)")
         }
     }
     
     extension ConnectionManager : MCSessionDelegate {
             
         func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-            NSLog("%@", "peer \(peerID) didChangeState: \(state)")
+           print("%@", "peer \(peerID) didChangeState: \(state)")
             }
             
         func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-            NSLog("%@", "didReceiveData: \(data)")
+            print("%@", "didReceiveData: \(data)")
             }
             
         func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
-            NSLog("%@", "didReceiveStream")
+            print("%@", "didReceiveStream")
             }
             
         func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
-            NSLog("%@", "didStartReceivingResourceWithName")
+            print("%@", "didStartReceivingResourceWithName")
             }
             
         func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
-            NSLog("%@", "didFinishReceivingResourceWithName")
+            print("%@", "didFinishReceivingResourceWithName")
             }
             
         }
