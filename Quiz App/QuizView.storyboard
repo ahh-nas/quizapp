@@ -141,24 +141,19 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="iOe-2E-7wp"/>
                     </view>
+                    <connections>
+                        <outlet property="answerLabel_A" destination="Wmx-au-WHG" id="6Z3-mb-DuN"/>
+                        <outlet property="answerLabel_B" destination="ARJ-uj-lRG" id="bsh-pc-iob"/>
+                        <outlet property="answerLabel_C" destination="cgC-BS-3V3" id="3A4-Vb-7yj"/>
+                        <outlet property="answerLabel_D" destination="Y0s-PK-C4N" id="ZD4-dY-Y1r"/>
+                        <outlet property="currentQuestionNumberLabel" destination="v3a-QZ-WFe" id="JkO-pz-zZk"/>
+                        <outlet property="questionLabel" destination="Hdr-lr-7Oj" id="RME-yw-WI8"/>
+                        <outlet property="totalQuestionLabel" destination="7DP-3p-2P5" id="z7b-D7-KjR"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N5u-Zd-e6O" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-543" y="98"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="phS-ey-if0">
-            <objects>
-                <viewController id="jgx-oH-v2T" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="iIy-Jc-6yE">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <viewLayoutGuide key="safeArea" id="nSD-V0-wXc"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="tZ7-CZ-OzG" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
         </scene>
     </scenes>
     <resources>
