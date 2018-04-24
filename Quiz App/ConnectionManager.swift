@@ -30,16 +30,19 @@ class ConnectionManager : NSObject
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: gameServiceType)
         self.serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: gameServiceType)
         super.init()
-        self.serviceAdvertiser.delegate = self as MCNearbyServiceAdvertiserDelegate
+       
+        self.serviceAdvertiser.delegate = self
         self.serviceAdvertiser.startAdvertisingPeer()
-        self.serviceBrowser.delegate = (self as MCNearbyServiceBrowserDelegate)
+       
+        self.serviceBrowser.delegate = self
         self.serviceBrowser.startBrowsingForPeers()
-        self.serviceBrowser.stopBrowsingForPeers()
+      
     }
     
     deinit
     {
         self.serviceAdvertiser.stopAdvertisingPeer()
+        self.serviceBrowser.stopBrowsingForPeers()
     }
     
 }
@@ -47,11 +50,11 @@ class ConnectionManager : NSObject
     {
         
         func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
-            print("%@", "didNotStartAdvertisingPeer: \(error)")
+            NSLog("%@", "didNotStartAdvertisingPeer: \(error)")
         }
         
         func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-            print("%@", "didReceiveInvitationFromPeer \(peerID)")
+            NSLog("%@", "didReceiveInvitationFromPeer \(peerID)")
             invitationHandler(true, self.session)
         }
         
@@ -61,40 +64,40 @@ class ConnectionManager : NSObject
     {
     
         func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
-        print("%@", "didNotStartBrowsingForPeers: \(error)")
+        NSLog("%@", "didNotStartBrowsingForPeers: \(error)")
         }
     
         func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-        print("%@", "foundPeer: \(peerID)")
-        print("%@", "invitePeer: \(peerID)")
+        NSLog("%@", "foundPeer: \(peerID)")
+        NSLog("%@", "invitePeer: \(peerID)")
         browser.invitePeer(peerID, to: self.session, withContext: nil, timeout: 10)
         }
     
         func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
-        print("%@", "lostPeer: \(peerID)")
+        NSLog("%@", "lostPeer: \(peerID)")
         }
     }
     
     extension ConnectionManager : MCSessionDelegate {
             
         func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-           print("%@", "peer \(peerID) didChangeState: \(state)")
+          NSLog("%@", "peer \(peerID) didChangeState: \(state)")
             }
             
         func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-            print("%@", "didReceiveData: \(data)")
+            NSLog("%@", "didReceiveData: \(data)")
             }
             
         func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
-            print("%@", "didReceiveStream")
+            NSLog("%@", "didReceiveStream")
             }
             
         func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
-            print("%@", "didStartReceivingResourceWithName")
+            NSLog("%@", "didStartReceivingResourceWithName")
             }
             
         func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
-            print("%@", "didFinishReceivingResourceWithName")
+            NSLog("%@", "didFinishReceivingResourceWithName")
             }
             
         }
