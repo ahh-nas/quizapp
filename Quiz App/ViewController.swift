@@ -13,6 +13,7 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     
     var session: MCSession!
     var peerID: MCPeerID!
+    //var connectedPeers : [MCPeerID] = []
     
     var browser: MCBrowserViewController!
     var assistant: MCAdvertiserAssistant!
@@ -20,8 +21,6 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
         
         self.peerID = MCPeerID(displayName: UIDevice.current.name)
         self.session = MCSession(peer: peerID)
@@ -34,17 +33,32 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         
     }
     
-    
+    func createAlert (title:String, message:String)
+    {
+        let alert = UIAlertController(title:title,message:message,preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title:"OK",style: UIAlertActionStyle.default, handler:{(action)in alert.dismiss(animated : true,completion : nil)}))
+        self.present(alert,animated: true, completion: nil)
+    }
 
 
     @IBAction func pressedStart(_ sender: Any)
     {
+        if (session.connectedPeers.count+1>4){
+            createAlert(title: "Sorry", message: "Too many players have connected, the max number of players is 4")
+        }
         
-            let quizStoryboard = UIStoryboard(name: "QuizView", bundle: .main)
-            if let quizVC = quizStoryboard.instantiateViewController(withIdentifier: "QuizView") as? QuizViewController {
+        if (session.connectedPeers.count+1<2){
+            createAlert(title: "Sorry", message: "Not enough players have connected, the minimum number of players is 2")
+            
+        }
+        
+        if (session.connectedPeers.count+1>=2 && session.connectedPeers.count<=4)
+            {
+                let quizStoryboard = UIStoryboard(name: "QuizView", bundle: .main)
+                if let quizVC = quizStoryboard.instantiateViewController(withIdentifier: "QuizView") as? QuizViewController {
                 self.present(quizVC, animated: true, completion: nil)
             }
-        
+        }
     }
     
     
@@ -58,24 +72,21 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     }
     
     
-    //**********************************************************
-    // required functions for MCBrowserViewControllerDelegate
+ 
     func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
-        // Called when the browser view controller is dismissed
         dismiss(animated: true, completion: nil)
     }
     
     func browserViewControllerWasCancelled(_ browserViewController: MCBrowserViewController) {
-        // Called when the browser view controller is cancelled
+   
         dismiss(animated: true, completion: nil)
     }
-    //**********************************************************
+   
     
     
     
     
-    //**********************************************************
-    // required functions for MCSessionDelegate
+
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         
     }
@@ -84,7 +95,7 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         
         print("inside didReceiveData")
         
-        // this needs to be run on the main thread
+
         DispatchQueue.main.async(execute: {
             
             if let receivedString = NSKeyedUnarchiver.unarchiveObject(with: data) as? String{
@@ -96,7 +107,6 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
                 //self.imgView.image = image
                 
                 //self.updateChatView(newText: "received image", id: peerID)
-                
                 
             }
             
@@ -129,7 +139,7 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     }
     //**********************************************************
     
-  
+    
     
     
 }
