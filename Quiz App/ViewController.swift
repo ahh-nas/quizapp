@@ -35,6 +35,19 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     }
     
     
+
+
+    @IBAction func pressedStart(_ sender: Any)
+    {
+        
+            let quizStoryboard = UIStoryboard(name: "QuizView", bundle: .main)
+            if let quizVC = quizStoryboard.instantiateViewController(withIdentifier: "QuizView") as? QuizViewController {
+                self.present(quizVC, animated: true, completion: nil)
+            }
+        
+    }
+    
+    
     
     
    

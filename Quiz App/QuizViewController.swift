@@ -114,6 +114,7 @@ class QuizViewController: UIViewController {
     }
     
     
+    //session.connectedpeers>4 error message
     
     /*
     // MARK: - Navigation
