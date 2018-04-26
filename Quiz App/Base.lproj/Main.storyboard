@@ -24,6 +24,9 @@
                                     <segment title="Single Player"/>
                                     <segment title="Multi Player"/>
                                 </segments>
+                                <connections>
+                                    <action selector="toggle:" destination="BYZ-38-t0r" eventType="valueChanged" id="Fje-m2-E8U"/>
+                                </connections>
                             </segmentedControl>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fTX-eN-9e3">
                                 <rect key="frame" x="167" y="526" width="46" height="30"/>

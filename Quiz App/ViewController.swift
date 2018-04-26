@@ -13,7 +13,7 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     
     var session: MCSession!
     var peerID: MCPeerID!
-    //var connectedPeers : [MCPeerID] = []
+    var toggleValue:Int = 0
     
     var browser: MCBrowserViewController!
     var assistant: MCAdvertiserAssistant!
@@ -40,24 +40,40 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         self.present(alert,animated: true, completion: nil)
     }
 
+    
+    @IBAction func toggle(_ sender: UISegmentedControl) {
+        if (sender.selectedSegmentIndex == 0)
+        {toggleValue=0}
+        if (sender.selectedSegmentIndex == 1)
+        {toggleValue=1}
+    }
+    
 
     @IBAction func pressedStart(_ sender: Any)
-    {
-        if (session.connectedPeers.count+1>4){
-            createAlert(title: "Sorry", message: "Too many players have connected, the max number of players is 4")
-        }
+    {   if(toggleValue == 1)
+        {
+            if (session.connectedPeers.count+1>4){
+                createAlert(title: "Sorry", message: "Too many players have connected, the max number of players is 4")
+            }
         
-        if (session.connectedPeers.count+1<2){
-            createAlert(title: "Sorry", message: "Not enough players have connected, the minimum number of players is 2")
+            if (session.connectedPeers.count+1<2){
+                createAlert(title: "Sorry", message: "Not enough players have connected, the minimum number of players is 2")
             
-        }
+            }
         
-        if (session.connectedPeers.count+1>=2 && session.connectedPeers.count<=4)
-            {
+            if (session.connectedPeers.count+1>=2 && session.connectedPeers.count<=4)
+                {
                 let quizStoryboard = UIStoryboard(name: "QuizView", bundle: .main)
                 if let quizVC = quizStoryboard.instantiateViewController(withIdentifier: "QuizView") as? QuizViewController {
                 self.present(quizVC, animated: true, completion: nil)
-            }
+                    }
+                }
+        }
+        
+        if(toggleValue == 0)
+        {
+            createAlert(title: "single player", message: "needs to be implemented")
+           //add new screen for single player
         }
     }
     
