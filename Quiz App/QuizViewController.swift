@@ -160,7 +160,33 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
         updateQuestion()
     }
     
-    //session.connectedpeers>4 error message
+    /**
+     * Game timer is updated.
+     */
+    @objc func updateClock() {
+        if timeSeconds > 0 {
+            timeSeconds -= 1
+            timerLabel.text = "\(timeSeconds)"
+        }else{
+            // go to next question
+            if currentQuestion == questionArray.count - 1 {
+                clockTimer.invalidate()
+            }else {
+                timeSeconds = 20
+                updateQuestion()
+            }
+        }
+    }
+    
+    /**
+     * Question objects
+     */
+    struct Question {
+        let number: Int
+        let correctOption : String
+        let questionSentence : String
+        let options : [String: Any]
+    }
     
     /*
     // MARK: - Navigation
