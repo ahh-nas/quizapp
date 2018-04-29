@@ -66,6 +66,7 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
             if (session.connectedPeers.count+1>=2 && session.connectedPeers.count<=4){
                 let msg = "start"
                 let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: msg)
+
                 
                 do{
                     try session.send(dataToSend, toPeers: session.connectedPeers, with: .unreliable)
@@ -151,8 +152,12 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         }
         
     }
-    //**********************************************************
-    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {if segue.identifier == "toQuizView"
+        {
+        let quizVC = segue.destination as! QuizViewController
+        quizVC.numberOfPeers = session.connectedPeers.count+1
+        }
+   }
     
     
 }

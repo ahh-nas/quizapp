@@ -19,7 +19,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     var timeSeconds = 20
     var labels = [UILabel]()
     var clockTimer = Timer()
-    
+    var numberOfPeers = 0
    
     // UI variables
     @IBOutlet weak var timerLabel: UILabel!
@@ -32,6 +32,19 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet weak var ans_B: UILabel!
     @IBOutlet weak var ans_C: UILabel!
     @IBOutlet weak var ans_D: UILabel!
+    
+    //images
+    
+    @IBOutlet weak var p1: UIImageView!
+    @IBOutlet weak var p2: UIImageView!
+    @IBOutlet weak var p3: UIImageView!
+    @IBOutlet weak var p4: UIImageView!
+    
+    //scores
+    @IBOutlet weak var p1s: UILabel!
+    @IBOutlet weak var p2s: UILabel!
+    @IBOutlet weak var p3s: UILabel!
+    @IBOutlet weak var p4s: UILabel!
     
     
     override func viewDidLoad() {
@@ -54,6 +67,21 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
         clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateClock), userInfo: nil, repeats: true)
         
         getJsonFromUrl()
+        
+        if(numberOfPeers == 2)
+        {
+            p3.isHidden = true
+            p4.isHidden = true
+            p3s.isHidden = true
+            p4s.isHidden = true
+        }
+        
+        if(numberOfPeers == 3)
+        {
+            p4.isHidden = true
+            p4s.isHidden = true
+            
+        }
     }
     
     override func didReceiveMemoryWarning() {
