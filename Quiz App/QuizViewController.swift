@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreMotion
 
 class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     
@@ -38,13 +39,13 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
         labels = [ans_A, ans_B, ans_C, ans_D]
         timerLabel.text = "\(timeSeconds)"
         for index in 0..<labels.count{
-            let selectTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.selectAnswerTap(sender:)))
+           // let selectTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.selectAnswerTap(sender:)))
             let submitTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.submitAnswerTap(sender:)))
-            selectTapGesture.numberOfTapsRequired = 1
+          //  selectTapGesture.numberOfTapsRequired = 1
             submitTapGesture.numberOfTapsRequired = 2
             labels[index].isUserInteractionEnabled = true
             labels[index].backgroundColor = UIColor.lightGray
-            labels[index].addGestureRecognizer(selectTapGesture)
+          //  labels[index].addGestureRecognizer(selectTapGesture)
             labels[index].tag = index
             labels[index].addGestureRecognizer(submitTapGesture)
         }
@@ -119,9 +120,10 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    /**
-     * Selected answer label turns blue.
-     */
+    /*Selected answer label turns blue.
+ */
+     
+     
     @objc func selectAnswerTap(sender: UITapGestureRecognizer){
         let selection = sender.view as! UILabel
         print("selected answer: \(String(describing: selection.text!))")
@@ -133,6 +135,56 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         }
     }
+    
+    var motionManger = CMMotionManager()
+    
+    override func viewDidAppear(_ animated: Bool) {
+        motionManger.gyroUpdateInterval = 1
+        motionManger.startGyroUpdates(to: OperationQueue.current!){data,error in
+            if let myData = data
+            {
+                if (myData.rotationRate.x < -0.25 && myData.rotationRate.y < -0.25)
+                {
+                    self.labels[0].backgroundColor = UIColor.blue
+                    self.labels[1].backgroundColor = UIColor.lightGray
+                    self.labels[2].backgroundColor = UIColor.lightGray
+                    self.labels[3].backgroundColor = UIColor.lightGray
+                }
+                
+                if (myData.rotationRate.x < -0.25 && myData.rotationRate.y > 0.25)
+                {
+                    self.labels[0].backgroundColor = UIColor.lightGray
+                    self.labels[1].backgroundColor = UIColor.blue
+                    self.labels[2].backgroundColor = UIColor.lightGray
+                    self.labels[3].backgroundColor = UIColor.lightGray
+                }
+                
+                if (myData.rotationRate.x > 0.25 && myData.rotationRate.y < -0.25)
+                {
+                    self.labels[0].backgroundColor = UIColor.lightGray
+                    self.labels[1].backgroundColor = UIColor.lightGray
+                    self.labels[2].backgroundColor = UIColor.blue
+                    self.labels[3].backgroundColor = UIColor.lightGray
+                }
+                
+                if (myData.rotationRate.x > 0.25 && myData.rotationRate.y > 0.25)
+                {
+                    self.labels[0].backgroundColor = UIColor.lightGray
+                    self.labels[1].backgroundColor = UIColor.lightGray
+                    self.labels[2].backgroundColor = UIColor.lightGray
+                    self.labels[3].backgroundColor = UIColor.blue
+                }
+               
+                
+                
+            
+               
+            }
+        }
+    }
+    
+    
+    
     
     /**
      * Selected answer is submitted and quiz moves to the next quesiton.
