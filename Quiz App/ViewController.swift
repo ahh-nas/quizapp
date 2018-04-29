@@ -79,8 +79,8 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         
         if(toggleValue == 0)
         {
-            createAlert(title: "single player", message: "needs to be implemented")
-           //self.performSegue(withIdentifier: "toSingleQuizView", sender: self)
+            //createAlert(title: "single player", message: "needs to be implemented")
+           self.performSegue(withIdentifier: "toSingleQuizView", sender: self)
             // need to connect viewController to singlePlayer.swift
         }
     }

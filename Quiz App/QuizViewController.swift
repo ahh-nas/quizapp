@@ -94,6 +94,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
+    
+    
     /**
      * View labels are updated to the next question.
      */
@@ -137,8 +139,45 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    var motionManger = CMMotionManager()
+    override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
+        if event?.subtype == UIEventSubtype.motionShake
+        {
+            let random = Int(arc4random_uniform(4))
+            self.labels[random].backgroundColor = UIColor.blue
+            
+            if (random == 0)
+            {
+                self.labels[1].backgroundColor = UIColor.lightGray
+                self.labels[2].backgroundColor = UIColor.lightGray
+                self.labels[3].backgroundColor = UIColor.lightGray
+            }
+            
+            if (random == 1)
+            {
+                self.labels[0].backgroundColor = UIColor.lightGray
+                self.labels[2].backgroundColor = UIColor.lightGray
+                self.labels[3].backgroundColor = UIColor.lightGray
+            }
+
+            if (random == 2)
+            {
+                self.labels[0].backgroundColor = UIColor.lightGray
+                self.labels[1].backgroundColor = UIColor.lightGray
+                self.labels[3].backgroundColor = UIColor.lightGray
+            }
+            
+            if (random == 3)
+            {
+                self.labels[0].backgroundColor = UIColor.lightGray
+                self.labels[2].backgroundColor = UIColor.lightGray
+                self.labels[1].backgroundColor = UIColor.lightGray
+            }
+        }
+    }
     
+    
+    
+    var motionManger = CMMotionManager()
     override func viewDidAppear(_ animated: Bool) {
         motionManger.gyroUpdateInterval = 1
         motionManger.startGyroUpdates(to: OperationQueue.current!){data,error in
