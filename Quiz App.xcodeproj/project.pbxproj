@@ -71,10 +71,10 @@
 			isa = PBXGroup;
 			children = (
 				6987CC62208CFDE300D01204 /* AppDelegate.swift */,
+				6987CC66208CFDE300D01204 /* Main.storyboard */,
 				6987CC64208CFDE300D01204 /* ViewController.swift */,
 				6987CC76208D137700D01204 /* QuizView.storyboard */,
 				6987CC77208D137700D01204 /* QuizViewController.swift */,
-				6987CC66208CFDE300D01204 /* Main.storyboard */,
 				695201422092612200FA581D /* singlePlayer.storyboard */,
 				695201442092613000FA581D /* singlePlayer.swift */,
 				6987CC69208CFDE300D01204 /* Assets.xcassets */,

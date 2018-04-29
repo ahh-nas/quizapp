@@ -19,6 +19,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     var timeSeconds = 20
     var labels = [UILabel]()
     var clockTimer = Timer()
+    
    
     // UI variables
     @IBOutlet weak var timerLabel: UILabel!
@@ -199,12 +200,13 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
                 labels[index].backgroundColor = UIColor.lightGray
             }
         }
+       
 //        clockTimer.invalidate()
-//        if selection.text == questionArray[currentQuestion].correctOption{
-//            print("Correct!")
-//        }else{
-//            print("The correct answer is: \(questionArray[currentQuestion].correctOption)")
-//        }
+        if selection.text == questionArray[currentQuestion].correctOption{
+            print("Correct!")
+        }else{
+            print("The correct answer is: \(questionArray[currentQuestion].correctOption)")
+        }
         //invalidate timer
         //  check answer
         // continue
