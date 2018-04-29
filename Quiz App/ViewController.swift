@@ -14,6 +14,7 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     var session: MCSession!
     var peerID: MCPeerID!
     var toggleValue:Int = 0
+    var numOfSubmissions = 0
     
     var browser: MCBrowserViewController!
     var assistant: MCAdvertiserAssistant!
@@ -32,6 +33,7 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         browser.delegate = self
         
     }
+    
     
     func createAlert (title:String, message:String)
     {
@@ -61,26 +63,30 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
             
             }
         
-            if (session.connectedPeers.count+1>=2 && session.connectedPeers.count<=4)
-                {
-                let quizStoryboard = UIStoryboard(name: "QuizView", bundle: .main)
-                if let quizVC = quizStoryboard.instantiateViewController(withIdentifier: "QuizView") as? QuizViewController {
-                self.present(quizVC, animated: true, completion: nil)
-                    }
+            if (session.connectedPeers.count+1>=2 && session.connectedPeers.count<=4){
+                let msg = "start"
+                let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: msg)
+                
+                do{
+                    try session.send(dataToSend, toPeers: session.connectedPeers, with: .unreliable)
+                     self.performSegue(withIdentifier: "toQuizView", sender: self)
                 }
+                catch let err {
+                    print("Error in sending data \(err)")
+                }
+            }
         }
         
         if(toggleValue == 0)
         {
             createAlert(title: "single player", message: "needs to be implemented")
-           //add new screen for single player
+           //self.performSegue(withIdentifier: "toSingleQuizView", sender: self)
+            // need to connect viewController to singlePlayer.swift
         }
     }
     
-    
-    
-    
    
+    
     @IBAction func connect(_ sender: UIButton) {
     
         present(browser, animated: true, completion: nil)
@@ -99,35 +105,27 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     }
    
     
-    
-    
-    
-
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        
         print("inside didReceiveData")
-        
-
         DispatchQueue.main.async(execute: {
-            
             if let receivedString = NSKeyedUnarchiver.unarchiveObject(with: data) as? String{
-                //self.updateChatView(newText: receivedString, id: peerID)
+                if receivedString == "start" {
+                    self.performSegue(withIdentifier: "toQuizView", sender: self)
+                }
+                if receivedString == "submit" {
+                    self.numOfSubmissions += 1
+                    if self.numOfSubmissions == session.connectedPeers.count{
+                        print("move to next question")
+                    }
+                }
             }
-            
-            if let image = UIImage(data: data) {
-                
-                //self.imgView.image = image
-                
-                //self.updateChatView(newText: "received image", id: peerID)
-                
-            }
-            
         })
     }
+    
     
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
         
@@ -154,7 +152,6 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         
     }
     //**********************************************************
-    
     
     
     

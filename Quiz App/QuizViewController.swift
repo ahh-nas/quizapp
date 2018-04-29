@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MultipeerConnectivity
 
 class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     
@@ -18,6 +19,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     var timeSeconds = 20
     var labels = [UILabel]()
     var clockTimer = Timer()
+    
    
     // UI variables
     @IBOutlet weak var timerLabel: UILabel!
@@ -147,12 +149,13 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
                 labels[index].backgroundColor = UIColor.lightGray
             }
         }
+       
 //        clockTimer.invalidate()
-//        if selection.text == questionArray[currentQuestion].correctOption{
-//            print("Correct!")
-//        }else{
-//            print("The correct answer is: \(questionArray[currentQuestion].correctOption)")
-//        }
+        if selection.text == questionArray[currentQuestion].correctOption{
+            print("Correct!")
+        }else{
+            print("The correct answer is: \(questionArray[currentQuestion].correctOption)")
+        }
         //invalidate timer
         //  check answer
         // continue
@@ -160,7 +163,30 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
         updateQuestion()
     }
     
-    //session.connectedpeers>4 error message
+    /**
+     * Game timer is updated.
+     */
+    @objc func updateClock() {
+        if timeSeconds > 0 {
+            timeSeconds -= 1
+            timerLabel.text = "\(timeSeconds)"
+        }else{
+            // go to next question
+            if currentQuestion == questionArray.count - 1 {
+                clockTimer.invalidate()
+            }else {
+                timeSeconds = 20
+                updateQuestion()
+            }
+        }
+    }
+    
+    struct Question {
+      let number: Int
+      let correctOption : String
+      let questionSentence : String
+      let options : [String: Any]
+     }
     
     /*
     // MARK: - Navigation
