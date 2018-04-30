@@ -168,10 +168,15 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
-        if event?.subtype == UIEventSubtype.motionShake
+        var shakeCounter:Int = 0
+        if (event?.subtype == UIEventSubtype.motionShake)
         {
+            if(shakeCounter == 0)
+            {
             let random = Int(arc4random_uniform(4))
             self.labels[random].backgroundColor = UIColor.blue
+            shakeCounter = shakeCounter + 1
+
             
             if (random == 0)
             {
@@ -200,6 +205,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
                 self.labels[2].backgroundColor = UIColor.lightGray
                 self.labels[1].backgroundColor = UIColor.lightGray
             }
+            }
         }
     }
     
@@ -207,40 +213,84 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var motionManger = CMMotionManager()
     override func viewDidAppear(_ animated: Bool) {
-        motionManger.gyroUpdateInterval = 1
+        motionManger.gyroUpdateInterval = 0.25
         motionManger.startGyroUpdates(to: OperationQueue.current!){data,error in
             if let myData = data
             {
-                if (myData.rotationRate.x < -0.25 && myData.rotationRate.y < -0.25)
+                if (myData.rotationRate.x < -1)
                 {
+                    if(self.labels[2].backgroundColor == UIColor.blue)
+                    {
                     self.labels[0].backgroundColor = UIColor.blue
                     self.labels[1].backgroundColor = UIColor.lightGray
                     self.labels[2].backgroundColor = UIColor.lightGray
                     self.labels[3].backgroundColor = UIColor.lightGray
+                    }
+                    
+                    if(self.labels[3].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.blue
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
                 }
                 
-                if (myData.rotationRate.x < -0.25 && myData.rotationRate.y > 0.25)
+                if (myData.rotationRate.y > 1)
                 {
-                    self.labels[0].backgroundColor = UIColor.lightGray
-                    self.labels[1].backgroundColor = UIColor.blue
-                    self.labels[2].backgroundColor = UIColor.lightGray
-                    self.labels[3].backgroundColor = UIColor.lightGray
+                    if(self.labels[0].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.blue
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
+                    
+                    if(self.labels[2].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.blue
+                    }
                 }
                 
-                if (myData.rotationRate.x > 0.25 && myData.rotationRate.y < -0.25)
+                if (myData.rotationRate.x > 1)
                 {
-                    self.labels[0].backgroundColor = UIColor.lightGray
-                    self.labels[1].backgroundColor = UIColor.lightGray
-                    self.labels[2].backgroundColor = UIColor.blue
-                    self.labels[3].backgroundColor = UIColor.lightGray
+                    if(self.labels[0].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.blue
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
+                    
+                    if(self.labels[1].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.blue
+                    }
                 }
                 
-                if (myData.rotationRate.x > 0.25 && myData.rotationRate.y > 0.25)
+                if (myData.rotationRate.y < -1)
                 {
-                    self.labels[0].backgroundColor = UIColor.lightGray
-                    self.labels[1].backgroundColor = UIColor.lightGray
-                    self.labels[2].backgroundColor = UIColor.lightGray
-                    self.labels[3].backgroundColor = UIColor.blue
+                    if(self.labels[1].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.blue
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
+                    
+                    if(self.labels[3].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.blue
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
                 }
                
                 
