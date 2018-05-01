@@ -11,10 +11,10 @@ import MultipeerConnectivity
 
 class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessionDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    var session: MCSession!
+    var session: MCSession! 
     var peerID: MCPeerID!
     var toggleValue:Int = 0
-    var numOfSubmissions = 0
+
     
     var browser: MCBrowserViewController!
     var assistant: MCAdvertiserAssistant!
@@ -31,7 +31,6 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         assistant.start()
         session.delegate = self
         browser.delegate = self
-        
     }
     
     
@@ -64,16 +63,20 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
             }
         
             if (session.connectedPeers.count+1>=2 && session.connectedPeers.count<=4){
+               
                 let msg = "start"
                 let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: msg)
-                
                 do{
-                    try session.send(dataToSend, toPeers: session.connectedPeers, with: .unreliable)
-                     self.performSegue(withIdentifier: "toQuizView", sender: self)
+                    try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
+                    //print("HERE")
+                    performSegue(withIdentifier: "toQuizView", sender: self)
+                    //print("SEGUE")
                 }
                 catch let err {
                     print("Error in sending data \(err)")
                 }
+                //performSegue(withIdentifier: "toQuizView", sender: self)
+                //print("SEGUE")
             }
         }
         
@@ -110,17 +113,12 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        print("inside didReceiveData")
+        print("inside didReceiveData viewcontroller")
         DispatchQueue.main.async(execute: {
             if let receivedString = NSKeyedUnarchiver.unarchiveObject(with: data) as? String{
                 if receivedString == "start" {
+                    //print("RECIEVED STRING: START")
                     self.performSegue(withIdentifier: "toQuizView", sender: self)
-                }
-                if receivedString == "submit" {
-                    self.numOfSubmissions += 1
-                    if self.numOfSubmissions == session.connectedPeers.count{
-                        print("move to next question")
-                    }
                 }
             }
         })
@@ -153,7 +151,17 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     }
     //**********************************************************
     
-    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+      
+        // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
+        if segue.identifier == "toQuizView"{
+            if let quizVC = segue.destination as? QuizViewController {
+                quizVC.session = self.session
+                quizVC.peerID = self.peerID
+            }
+        }
+    }
     
 }
 

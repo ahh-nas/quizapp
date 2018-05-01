@@ -8,18 +8,23 @@
 
 import UIKit
 import CoreMotion
+import MultipeerConnectivity
 
-class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
+class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessionDelegate {
     
     //the json file url
-    let QUIZ_URL = "http://www.people.vcu.edu/~ebulut/jsonFiles/quiz1.json"
+    var QUIZ_URL = "http://www.people.vcu.edu/~ebulut/jsonFiles/quiz1.json"
     var questionArray = [Question]()
     var totalQuestions = 0
     var currentQuestion = -1
     var timeSeconds = 20
+    var session : MCSession!
+    var peerID : MCPeerID!
     var labels = [UILabel]()
     var clockTimer = Timer()
-    
+    var numOfSubmissions = 0
+    var submittedAnswer = ""
+    var score = 0
    
     // UI variables
     @IBOutlet weak var timerLabel: UILabel!
@@ -37,16 +42,19 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        session.delegate = self
         labels = [ans_A, ans_B, ans_C, ans_D]
         timerLabel.text = "\(timeSeconds)"
+        
         for index in 0..<labels.count{
-           // let selectTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.selectAnswerTap(sender:)))
+            let selectTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.selectAnswerTap(sender:)))
             let submitTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.submitAnswerTap(sender:)))
-          //  selectTapGesture.numberOfTapsRequired = 1
+            selectTapGesture.numberOfTapsRequired = 1
             submitTapGesture.numberOfTapsRequired = 2
             labels[index].isUserInteractionEnabled = true
             labels[index].backgroundColor = UIColor.lightGray
-          //  labels[index].addGestureRecognizer(selectTapGesture)
+            labels[index].addGestureRecognizer(selectTapGesture)
             labels[index].tag = index
             labels[index].addGestureRecognizer(submitTapGesture)
         }
@@ -98,6 +106,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
      * View labels are updated to the next question.
      */
     func updateQuestion(){
+        timeSeconds = 21
         if currentQuestion < questionArray.count - 1 {
             currentQuestion += 1
             DispatchQueue.main.async {
@@ -106,13 +115,13 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
                     self.currentQuestionNumberLabel.text = "\(self.questionArray[self.currentQuestion].number)"
                     self.totalQuestionLabel.text = "\(self.totalQuestions)"
         
-                    self.ans_A.text = self.questionArray[self.currentQuestion].options["A"] as? String
+                    self.ans_A.text = "A: \(String(describing: self.questionArray[self.currentQuestion].options["A"] as! String))"
                     self.ans_A.backgroundColor = UIColor.lightGray
-                    self.ans_B.text = self.questionArray[self.currentQuestion].options["B"] as? String
+                    self.ans_B.text = "B: \(String(describing: self.questionArray[self.currentQuestion].options["B"] as! String))"
                     self.ans_B.backgroundColor = UIColor.lightGray
-                    self.ans_C.text = self.questionArray[self.currentQuestion].options["C"] as? String
+                    self.ans_C.text = "C: \(String(describing: self.questionArray[self.currentQuestion].options["C"] as! String))"
                     self.ans_C.backgroundColor = UIColor.lightGray
-                    self.ans_D.text = self.questionArray[self.currentQuestion].options["D"] as? String
+                    self.ans_D.text = "D: \(String(describing: self.questionArray[self.currentQuestion].options["D"] as! String))"
                     self.ans_D.backgroundColor = UIColor.lightGray
                 }else{
                     print("No questions available")
@@ -175,24 +184,19 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
                     self.labels[2].backgroundColor = UIColor.lightGray
                     self.labels[3].backgroundColor = UIColor.blue
                 }
-               
-                
-                
-            
-               
             }
         }
     }
-    
-    
+   
     
     
     /**
-     * Selected answer is submitted and quiz moves to the next quesiton.
+     * Selected answer is submitted and quiz moves to the next question.
      */
     @objc func submitAnswerTap(sender: UITapGestureRecognizer){
         let selection = sender.view as! UILabel
-        print("submitted answer: \(String(describing: selection.text!))")
+        submittedAnswer = selection.text!
+        print("submitted answer: \(submittedAnswer)")
         for index in 0..<labels.count{
             if labels[index] == selection{
                 labels[index].backgroundColor = UIColor.green
@@ -200,34 +204,46 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
                 labels[index].backgroundColor = UIColor.lightGray
             }
         }
-       
-//        clockTimer.invalidate()
-        if selection.text == questionArray[currentQuestion].correctOption{
-            print("Correct!")
-        }else{
-            print("The correct answer is: \(questionArray[currentQuestion].correctOption)")
+
+        let msg = "submit"
+        let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: msg)
+        do{
+            self.numOfSubmissions += 1
+            try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
         }
-        //invalidate timer
-        //  check answer
-        // continue
-        timeSeconds = 21
-        updateQuestion()
+        catch let err {
+            print("Error in sending data \(err)")
+        }
+        
     }
     
     /**
-     * Game timer is updated.
+     * Game timer and questions are updated.
      */
     @objc func updateClock() {
-        if timeSeconds > 0 {
+        if timeSeconds > 0 {            // update the timer each second
             timeSeconds -= 1
             timerLabel.text = "\(timeSeconds)"
         }else{
-            // go to next question
-            if currentQuestion == questionArray.count - 1 {
+            if isLastQuestion() {       // at the last question & timer reaches 0
                 clockTimer.invalidate()
-            }else {
-                timeSeconds = 20
+            }else{                      // update the question
+               // timeSeconds = 21
                 updateQuestion()
+            }
+        }
+        
+        // if all players have submitted, update the question
+        if numOfSubmissions == session.connectedPeers.count + 1 {
+            self.numOfSubmissions = 0
+            
+            let msg = "next"
+            let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: msg)
+            do {
+                try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
+            }
+            catch let err {
+                print("Error in sending data \(err)")
             }
         }
     }
@@ -241,6 +257,72 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
         let questionSentence : String
         let options : [String: Any]
     }
+    
+    func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
+    }
+    
+    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+        DispatchQueue.main.async(execute: {
+            if let receivedString = NSKeyedUnarchiver.unarchiveObject(with: data) as? String{
+                if receivedString == "submit" && peerID != self.peerID {
+                    print("other")
+                    self.numOfSubmissions += 1
+                }
+                if receivedString == "next" && peerID != self.peerID{
+                    print("other update")
+                    if !(self.isLastQuestion()) { // if not the last question
+                        // show correct answer
+                        UIView.animate(withDuration: 3, animations: {
+                            if self.submittedAnswer == self.questionArray[self.currentQuestion].correctOption{
+                                self.timerLabel.text = "Correct!"
+                            }else{
+                               self.timerLabel.text = "Answer is: \(self.questionArray[self.currentQuestion].correctOption)"
+                            }
+                        }, completion: nil)
+                        self.updateQuestion()
+                    }else{
+                        UIView.animate(withDuration: 3, animations: {
+                            if self.submittedAnswer == self.questionArray[self.currentQuestion].correctOption{
+                                self.timerLabel.text = "Correct"
+                            }else{
+                                self.timerLabel.text = "Correct answer is: \(self.questionArray[self.currentQuestion].correctOption)"
+                            }
+                        }, completion: nil)
+                        self.clockTimer.invalidate()
+                    }
+                }
+            }
+        })
+    }
+    
+    
+    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
+    }
+    
+    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
+    }
+    
+    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+        // Called when a connected peer changes state (for example, goes offline)
+        switch state {
+        case MCSessionState.connected:
+            print("Connected: \(peerID.displayName)")
+            
+        case MCSessionState.connecting:
+            print("Connecting: \(peerID.displayName)")
+            
+        case MCSessionState.notConnected:
+            print("Not Connected: \(peerID.displayName)")
+        }
+    }
+    
+    func isLastQuestion()-> Bool{
+        if currentQuestion == questionArray.count - 1 {
+            return true
+        }
+        return false
+    }
+    
     
     /*
     // MARK: - Navigation

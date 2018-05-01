@@ -78,8 +78,8 @@
 				695201422092612200FA581D /* singlePlayer.storyboard */,
 				695201442092613000FA581D /* singlePlayer.swift */,
 				6987CC69208CFDE300D01204 /* Assets.xcassets */,
-				6987CC6E208CFDE300D01204 /* Info.plist */,
 				F4E54B3D2090F1FE00AD5AEE /* LaunchScreen.storyboard */,
+				6987CC6E208CFDE300D01204 /* Info.plist */,
 			);
 			path = "Quiz App";
 			sourceTree = "<group>";
@@ -300,7 +300,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = GK6EP7YV83;
+				DEVELOPMENT_TEAM = 8B4QBLLSCD;
 				INFOPLIST_FILE = "Quiz App/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Anas-Zafar.Quiz-Appp";
@@ -320,7 +320,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = GK6EP7YV83;
+				DEVELOPMENT_TEAM = 8B4QBLLSCD;
 				INFOPLIST_FILE = "Quiz App/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Anas-Zafar.Quiz-Appp";
