@@ -20,6 +20,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     var labels = [UILabel]()
     var clockTimer = Timer()
     var numberOfPeers = 0
+    
    
     // UI variables
     @IBOutlet weak var timerLabel: UILabel!
@@ -47,6 +48,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet weak var p4s: UILabel!
     
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -67,6 +69,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
         clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateClock), userInfo: nil, repeats: true)
         
         getJsonFromUrl()
+       
+
         
         if(numberOfPeers == 2)
         {
@@ -74,6 +78,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
             p4.isHidden = true
             p3s.isHidden = true
             p4s.isHidden = true
+            print()
         }
         
         if(numberOfPeers == 3)
@@ -299,6 +304,17 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate {
                
             }
         }
+        
+       /* let headingManger = CMMotionManager()
+        
+        headingManger.magnetometerUpdateInterval = 1
+        headingManger.startMagnetometerUpdates(to: OperationQueue.current!) { (data,error) in
+            if let mData = data
+            {
+                mData.magneticField
+                print(mData)
+            }
+        }*/
     }
     
     
