@@ -23,8 +23,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     var labels = [UILabel]()
     var scores = [UILabel]()
     var clockTimer = Timer()
-    var zSubmission: Int = 0
     var numOfSubmissions = 0
+    var selectedAnswer = ""
     var submittedAnswer = ""
     var score = 0
     var numberOfPeers = 0
@@ -171,7 +171,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
      
     @objc func selectAnswerTap(sender: UITapGestureRecognizer){
         let selection = sender.view as! UILabel
-        print("selected answer: \(String(describing: selection.text!))")
+        selectedAnswer = String(describing: selection.text?.first!).trimmingCharacters(in: .whitespaces)
+        print("selected answer: \(selectedAnswer)")
         for index in 0..<labels.count{
             if labels[index] == selection{
                 labels[index].backgroundColor = UIColor.blue
@@ -189,6 +190,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
             {
             let random = Int(arc4random_uniform(4))
             self.labels[random].backgroundColor = UIColor.blue
+                self.selectedAnswer = String(describing: labels[random].text?.first!).trimmingCharacters(in: .whitespaces)
             shakeCounter = shakeCounter + 1
 
             
@@ -231,7 +233,6 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         motionManger.startGyroUpdates(to: OperationQueue.current!){data,error in
             if let myData = data
             {
-               
                 if (myData.rotationRate.x < -1)
                 {
                     if(self.labels[2].backgroundColor == UIColor.blue)
@@ -240,9 +241,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         self.labels[1].backgroundColor = UIColor.lightGray
                         self.labels[2].backgroundColor = UIColor.lightGray
                         self.labels[3].backgroundColor = UIColor.lightGray
-                        self.zSubmission = 0
-
-                        
+                        self.selectedAnswer = "A"
+                        print("TURNED xA \(self.selectedAnswer)")
                     }
                     
                     if(self.labels[3].backgroundColor == UIColor.blue)
@@ -251,7 +251,9 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         self.labels[1].backgroundColor = UIColor.blue
                         self.labels[2].backgroundColor = UIColor.lightGray
                         self.labels[3].backgroundColor = UIColor.lightGray
-                        self.zSubmission = 1
+                        self.selectedAnswer = "B"
+
+                        print("TURNED yB \(self.selectedAnswer)")
                     }
     
                 }
@@ -264,7 +266,9 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         self.labels[1].backgroundColor = UIColor.blue
                         self.labels[2].backgroundColor = UIColor.lightGray
                         self.labels[3].backgroundColor = UIColor.lightGray
-                        self.zSubmission = 1
+                        self.selectedAnswer = "B"
+
+                        print("TURNED yB \(self.selectedAnswer)")
                     }
                     
                     if(self.labels[2].backgroundColor == UIColor.blue)
@@ -273,7 +277,9 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         self.labels[1].backgroundColor = UIColor.lightGray
                         self.labels[2].backgroundColor = UIColor.lightGray
                         self.labels[3].backgroundColor = UIColor.blue
-                        self.zSubmission = 3
+                        self.selectedAnswer = "D"
+
+                        print("TURNED yD \(self.selectedAnswer)")
                     }
                 }
                 
@@ -285,8 +291,9 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         self.labels[1].backgroundColor = UIColor.lightGray
                         self.labels[2].backgroundColor = UIColor.blue
                         self.labels[3].backgroundColor = UIColor.lightGray
-                        self.zSubmission = 2
-                      
+                        self.selectedAnswer = "C"
+
+                        print("TURNED -xA \(self.selectedAnswer)")
                     }
                     
                     if(self.labels[1].backgroundColor == UIColor.blue)
@@ -295,7 +302,9 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         self.labels[1].backgroundColor = UIColor.lightGray
                         self.labels[2].backgroundColor = UIColor.lightGray
                         self.labels[3].backgroundColor = UIColor.blue
-                        self.zSubmission = 3
+                        self.selectedAnswer = "D"
+
+                        print("TURNED -xB \(self.selectedAnswer)")
                     }
                 }
                 
@@ -307,7 +316,9 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         self.labels[1].backgroundColor = UIColor.lightGray
                         self.labels[2].backgroundColor = UIColor.lightGray
                         self.labels[3].backgroundColor = UIColor.lightGray
-                        self.zSubmission = 0
+                        self.submittedAnswer = "D"
+                        print("TURNED -yB \(self.selectedAnswer)")
+                        
                     }
                     
                     if(self.labels[3].backgroundColor == UIColor.blue)
@@ -316,19 +327,20 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         self.labels[1].backgroundColor = UIColor.lightGray
                         self.labels[2].backgroundColor = UIColor.blue
                         self.labels[3].backgroundColor = UIColor.lightGray
-                        self.zSubmission = 2
+                        self.selectedAnswer = "C"
+
+                        print("TURNED -yD \(self.selectedAnswer)")
                     }
                 }
                 
                 if (myData.rotationRate.z > 3 || myData.rotationRate.z < -3)
                 {
-                    print("TURNED BITCH")
-                    self.submittedAnswer = String(self.zSubmission)
-                    print("submitted answer: \(self.submittedAnswer)")
+                    print("TURNED FOR SUBMISSION")
+                    self.submittedAnswer = self.selectedAnswer
+                    print("submitted answer cmotion: \(self.submittedAnswer)")
                     for index in 0..<self.labels.count
                     {
-                        if String(describing: self.labels[index]) == String(self.zSubmission)
-                        {
+                        if String(describing: self.labels[index].text?.first!).trimmingCharacters(in: CharacterSet.whitespaces) == self.submittedAnswer                        {
                             self.labels[index].backgroundColor = UIColor.green
                         }
                         else{
@@ -342,6 +354,9 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                     {
                         self.numOfSubmissions += 1
                         try self.session.send(dataToSend, toPeers: self.session.connectedPeers, with: .reliable)
+                        for index in 0..<self.labels.count{
+                            self.labels[index].isUserInteractionEnabled = false
+                        }
                     }
                     catch let err {
                         print("Error in sending data \(err)")
@@ -372,8 +387,23 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     @objc func submitAnswerTap(sender: UITapGestureRecognizer){
         let selection = sender.view as! UILabel
         submittedAnswer = String(selection.text!.first!).trimmingCharacters(in: CharacterSet.whitespaces)
-
-        print("submitted answer: \(submittedAnswer)")
+//        if (submittedAnswer == "A")
+//        {
+//            zSubmission = "A"
+//        }
+//        if (submittedAnswer == "B")
+//        {
+//            zSubmission = "B"
+//        }
+//        if (submittedAnswer == "C")
+//        {
+//            zSubmission = "C"
+//        }
+//        if (submittedAnswer == "D")
+//        {
+//            zSubmission = "D"
+//        }
+        print("submitted answer tap: \(submittedAnswer)")
         for index in 0..<labels.count{
             if labels[index] == selection{
                 labels[index].backgroundColor = UIColor.green
