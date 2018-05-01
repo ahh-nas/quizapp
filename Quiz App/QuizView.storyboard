@@ -147,6 +147,14 @@
                         <outlet property="ans_C" destination="cgC-BS-3V3" id="sED-1e-REe"/>
                         <outlet property="ans_D" destination="Y0s-PK-C4N" id="uBn-Pu-RTH"/>
                         <outlet property="currentQuestionNumberLabel" destination="v3a-QZ-WFe" id="JkO-pz-zZk"/>
+                        <outlet property="p1" destination="wgB-Zg-Ugh" id="cKL-rL-5CD"/>
+                        <outlet property="p1s" destination="k0f-fN-XlU" id="XNi-yf-BLH"/>
+                        <outlet property="p2" destination="4sf-aa-JGA" id="wva-1v-GfL"/>
+                        <outlet property="p2s" destination="gLr-Q2-odk" id="wRn-cC-yz3"/>
+                        <outlet property="p3" destination="sL2-H5-8MV" id="BqV-dK-VDg"/>
+                        <outlet property="p3s" destination="5au-OQ-UqY" id="Y5D-Bj-rPP"/>
+                        <outlet property="p4" destination="wXh-8f-3Oc" id="bpY-Uq-qCC"/>
+                        <outlet property="p4s" destination="j5g-S5-6qj" id="AAT-hO-ff6"/>
                         <outlet property="questionLabel" destination="Hdr-lr-7Oj" id="Z8i-jx-uCK"/>
                         <outlet property="timerLabel" destination="SNO-Ph-qBH" id="Rfm-tl-9Ff"/>
                         <outlet property="totalQuestionLabel" destination="7DP-3p-2P5" id="z7b-D7-KjR"/>

@@ -22,9 +22,11 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     var peerID : MCPeerID!
     var labels = [UILabel]()
     var clockTimer = Timer()
+
     var numOfSubmissions = 0
     var submittedAnswer = ""
     var score = 0
+    var numberOfPeers = 0
    
     // UI variables
     @IBOutlet weak var timerLabel: UILabel!
@@ -37,6 +39,20 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     @IBOutlet weak var ans_B: UILabel!
     @IBOutlet weak var ans_C: UILabel!
     @IBOutlet weak var ans_D: UILabel!
+    
+    //images
+    
+    @IBOutlet weak var p1: UIImageView!
+    @IBOutlet weak var p2: UIImageView!
+    @IBOutlet weak var p3: UIImageView!
+    @IBOutlet weak var p4: UIImageView!
+    
+    //scores
+    @IBOutlet weak var p1s: UILabel!
+    @IBOutlet weak var p2s: UILabel!
+    @IBOutlet weak var p3s: UILabel!
+    @IBOutlet weak var p4s: UILabel!
+    
     
     
     override func viewDidLoad() {
@@ -62,6 +78,24 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateClock), userInfo: nil, repeats: true)
         
         getJsonFromUrl()
+       
+
+        
+        if(numberOfPeers == 2)
+        {
+            p3.isHidden = true
+            p4.isHidden = true
+            p3s.isHidden = true
+            p4s.isHidden = true
+            print()
+        }
+        
+        if(numberOfPeers == 3)
+        {
+            p4.isHidden = true
+            p4s.isHidden = true
+            
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -101,6 +135,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
             questionArray.append(newQuestion)
         }
     }
+    
+    
     
     /**
      * View labels are updated to the next question.
@@ -146,46 +182,144 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         }
     }
     
-    var motionManger = CMMotionManager()
+    override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
+        var shakeCounter:Int = 0
+        if (event?.subtype == UIEventSubtype.motionShake)
+        {
+            if(shakeCounter == 0)
+            {
+            let random = Int(arc4random_uniform(4))
+            self.labels[random].backgroundColor = UIColor.blue
+            shakeCounter = shakeCounter + 1
+
+            
+            if (random == 0)
+            {
+                self.labels[1].backgroundColor = UIColor.lightGray
+                self.labels[2].backgroundColor = UIColor.lightGray
+                self.labels[3].backgroundColor = UIColor.lightGray
+            }
+            
+            if (random == 1)
+            {
+                self.labels[0].backgroundColor = UIColor.lightGray
+                self.labels[2].backgroundColor = UIColor.lightGray
+                self.labels[3].backgroundColor = UIColor.lightGray
+            }
+
+            if (random == 2)
+            {
+                self.labels[0].backgroundColor = UIColor.lightGray
+                self.labels[1].backgroundColor = UIColor.lightGray
+                self.labels[3].backgroundColor = UIColor.lightGray
+            }
+            
+            if (random == 3)
+            {
+                self.labels[0].backgroundColor = UIColor.lightGray
+                self.labels[2].backgroundColor = UIColor.lightGray
+                self.labels[1].backgroundColor = UIColor.lightGray
+            }
+            }
+        }
+    }
     
+    
+    
+    var motionManger = CMMotionManager()
     override func viewDidAppear(_ animated: Bool) {
-        motionManger.gyroUpdateInterval = 1
+        motionManger.gyroUpdateInterval = 0.25
         motionManger.startGyroUpdates(to: OperationQueue.current!){data,error in
             if let myData = data
             {
-                if (myData.rotationRate.x < -0.25 && myData.rotationRate.y < -0.25)
+                if (myData.rotationRate.x < -1)
                 {
+                    if(self.labels[2].backgroundColor == UIColor.blue)
+                    {
                     self.labels[0].backgroundColor = UIColor.blue
                     self.labels[1].backgroundColor = UIColor.lightGray
                     self.labels[2].backgroundColor = UIColor.lightGray
                     self.labels[3].backgroundColor = UIColor.lightGray
+                    }
+                    
+                    if(self.labels[3].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.blue
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
                 }
                 
-                if (myData.rotationRate.x < -0.25 && myData.rotationRate.y > 0.25)
+                if (myData.rotationRate.y > 1)
                 {
-                    self.labels[0].backgroundColor = UIColor.lightGray
-                    self.labels[1].backgroundColor = UIColor.blue
-                    self.labels[2].backgroundColor = UIColor.lightGray
-                    self.labels[3].backgroundColor = UIColor.lightGray
+                    if(self.labels[0].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.blue
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
+                    
+                    if(self.labels[2].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.blue
+                    }
                 }
                 
-                if (myData.rotationRate.x > 0.25 && myData.rotationRate.y < -0.25)
+                if (myData.rotationRate.x > 1)
                 {
-                    self.labels[0].backgroundColor = UIColor.lightGray
-                    self.labels[1].backgroundColor = UIColor.lightGray
-                    self.labels[2].backgroundColor = UIColor.blue
-                    self.labels[3].backgroundColor = UIColor.lightGray
+                    if(self.labels[0].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.blue
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
+                    
+                    if(self.labels[1].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.blue
+                    }
                 }
                 
-                if (myData.rotationRate.x > 0.25 && myData.rotationRate.y > 0.25)
+                if (myData.rotationRate.y < -1)
                 {
-                    self.labels[0].backgroundColor = UIColor.lightGray
-                    self.labels[1].backgroundColor = UIColor.lightGray
-                    self.labels[2].backgroundColor = UIColor.lightGray
-                    self.labels[3].backgroundColor = UIColor.blue
+                    if(self.labels[1].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.blue
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.lightGray
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
+                    
+                    if(self.labels[3].backgroundColor == UIColor.blue)
+                    {
+                        self.labels[0].backgroundColor = UIColor.lightGray
+                        self.labels[1].backgroundColor = UIColor.lightGray
+                        self.labels[2].backgroundColor = UIColor.blue
+                        self.labels[3].backgroundColor = UIColor.lightGray
+                    }
                 }
             }
         }
+        
+       /* let headingManger = CMMotionManager()
+        
+        headingManger.magnetometerUpdateInterval = 1
+        headingManger.startMagnetometerUpdates(to: OperationQueue.current!) { (data,error) in
+            if let mData = data
+            {
+                mData.magneticField
+                print(mData)
+            }
+        }*/
     }
    
     

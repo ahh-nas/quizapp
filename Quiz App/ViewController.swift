@@ -66,6 +66,7 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
                
                 let msg = "start"
                 let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: msg)
+
                 do{
                     try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
                     //print("HERE")
@@ -82,8 +83,8 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         
         if(toggleValue == 0)
         {
-            createAlert(title: "single player", message: "needs to be implemented")
-           //self.performSegue(withIdentifier: "toSingleQuizView", sender: self)
+            //createAlert(title: "single player", message: "needs to be implemented")
+           self.performSegue(withIdentifier: "toSingleQuizView", sender: self)
             // need to connect viewController to singlePlayer.swift
         }
     }
@@ -149,6 +150,7 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         }
         
     }
+
     //**********************************************************
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -159,9 +161,9 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
             if let quizVC = segue.destination as? QuizViewController {
                 quizVC.session = self.session
                 quizVC.peerID = self.peerID
+                quizVC.numberOfPeers = session.connectedPeers.count+1
             }
         }
     }
-    
 }
 
