@@ -14,7 +14,6 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     var session: MCSession! 
     var peerID: MCPeerID!
     var toggleValue:Int = 0
-
     
     var browser: MCBrowserViewController!
     var assistant: MCAdvertiserAssistant!
@@ -43,13 +42,13 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
 
     
     @IBAction func toggle(_ sender: UISegmentedControl) {
-        if (sender.selectedSegmentIndex == 0)
-        {toggleValue=0}
-        if (sender.selectedSegmentIndex == 1)
-        {toggleValue=1}
+        if (sender.selectedSegmentIndex == 0){toggleValue = 0}
+        if (sender.selectedSegmentIndex == 1){toggleValue = 1}
     }
     
-
+    /**
+     *  Sets the number of pres
+     */
     @IBAction func pressedStart(_ sender: Any)
     {   if(toggleValue == 1)
         {
@@ -59,46 +58,35 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
         
             if (session.connectedPeers.count+1<2){
                 createAlert(title: "Sorry", message: "Not enough players have connected, the minimum number of players is 2")
-            
             }
         
             if (session.connectedPeers.count+1>=2 && session.connectedPeers.count<=4){
-               
                 let msg = "start"
                 let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: msg)
 
                 do{
                     try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
-                    //print("HERE")
                     performSegue(withIdentifier: "toQuizView", sender: self)
-                    //print("SEGUE")
                 }
                 catch let err {
                     print("Error in sending data \(err)")
                 }
-                //performSegue(withIdentifier: "toQuizView", sender: self)
-                //print("SEGUE")
             }
         }
         
         if(toggleValue == 0)
         {
-            //createAlert(title: "single player", message: "needs to be implemented")
+           //createAlert(title: "single player", message: "needs to be implemented")
            self.performSegue(withIdentifier: "toSingleQuizView", sender: self)
-            // need to connect viewController to singlePlayer.swift
         }
     }
     
-   
-    
     @IBAction func connect(_ sender: UIButton) {
-    
         present(browser, animated: true, completion: nil)
-        
     }
     
     
- 
+   /* MCBrowserViewControllerDelegate Functions */
     func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
         dismiss(animated: true, completion: nil)
     }
@@ -109,16 +97,15 @@ class ViewController: UIViewController, MCBrowserViewControllerDelegate, MCSessi
     }
    
     
+    /* MCSessionDelegate Functions */
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        print("inside didReceiveData viewcontroller")
         DispatchQueue.main.async(execute: {
             if let receivedString = NSKeyedUnarchiver.unarchiveObject(with: data) as? String{
                 if receivedString == "start" {
-                    //print("RECIEVED STRING: START")
                     self.performSegue(withIdentifier: "toQuizView", sender: self)
                 }
             }

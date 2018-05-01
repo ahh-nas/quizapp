@@ -21,6 +21,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     var session : MCSession!
     var peerID : MCPeerID!
     var labels = [UILabel]()
+    var scores = [UILabel]()
     var clockTimer = Timer()
 
     var numOfSubmissions = 0
@@ -40,14 +41,13 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     @IBOutlet weak var ans_C: UILabel!
     @IBOutlet weak var ans_D: UILabel!
     
-    //images
-    
+    //Player images
     @IBOutlet weak var p1: UIImageView!
     @IBOutlet weak var p2: UIImageView!
     @IBOutlet weak var p3: UIImageView!
     @IBOutlet weak var p4: UIImageView!
     
-    //scores
+    //Player scores
     @IBOutlet weak var p1s: UILabel!
     @IBOutlet weak var p2s: UILabel!
     @IBOutlet weak var p3s: UILabel!
@@ -61,6 +61,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         
         session.delegate = self
         labels = [ans_A, ans_B, ans_C, ans_D]
+        scores = [p1s, p2s, p3s, p4s]
         timerLabel.text = "\(timeSeconds)"
         
         for index in 0..<labels.count{
@@ -78,8 +79,6 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateClock), userInfo: nil, repeats: true)
         
         getJsonFromUrl()
-       
-
         
         if(numberOfPeers == 2)
         {
@@ -143,6 +142,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
      */
     func updateQuestion(){
         timeSeconds = 21
+        
         if currentQuestion < questionArray.count - 1 {
             currentQuestion += 1
             DispatchQueue.main.async {
@@ -223,7 +223,6 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
             }
         }
     }
-    
     
     
     var motionManger = CMMotionManager()
@@ -329,7 +328,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
      */
     @objc func submitAnswerTap(sender: UITapGestureRecognizer){
         let selection = sender.view as! UILabel
-        submittedAnswer = selection.text!
+        submittedAnswer = String(selection.text!.first!).trimmingCharacters(in: CharacterSet.whitespaces)
+
         print("submitted answer: \(submittedAnswer)")
         for index in 0..<labels.count{
             if labels[index] == selection{
@@ -344,11 +344,13 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         do{
             self.numOfSubmissions += 1
             try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
+             for index in 0..<labels.count{
+                labels[index].isUserInteractionEnabled = false
+            }
         }
         catch let err {
             print("Error in sending data \(err)")
         }
-        
     }
     
     /**
@@ -358,10 +360,11 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         if timeSeconds > 0 {            // update the timer each second
             timeSeconds -= 1
             timerLabel.text = "\(timeSeconds)"
+
         }else{
             if isLastQuestion() {       // at the last question & timer reaches 0
                 clockTimer.invalidate()
-            }else{                      // update the question
+            }else{                      // update the question when timer reaches 0
                // timeSeconds = 21
                 updateQuestion()
             }
@@ -392,6 +395,20 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         let options : [String: Any]
     }
     
+    func calculateScore(){//}, submissionTime: Int){
+        self.score += 1
+        self.scores[0].text = "\(score)"
+       
+        // send score to other players
+        let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: self.score)
+        do{
+            try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
+        }
+        catch let err {
+            print("Error in sending data \(err)")
+        }
+    }
+    
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
     }
     
@@ -402,27 +419,34 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                     print("other")
                     self.numOfSubmissions += 1
                 }
-                if receivedString == "next" && peerID != self.peerID{
-                    print("other update")
-                    if !(self.isLastQuestion()) { // if not the last question
-                        // show correct answer
-                        UIView.animate(withDuration: 3, animations: {
-                            if self.submittedAnswer == self.questionArray[self.currentQuestion].correctOption{
-                                self.timerLabel.text = "Correct!"
-                            }else{
-                               self.timerLabel.text = "Answer is: \(self.questionArray[self.currentQuestion].correctOption)"
+                if receivedString == "next" && peerID != self.peerID {
+                    
+                    UIView.animate(withDuration: 3, animations: {
+                        if self.submittedAnswer == self.questionArray[self.currentQuestion].correctOption{
+                            self.timerLabel.text = "Correct!"
+                            self.calculateScore()
+                            
+                        }else{
+                           self.timerLabel.text = "Answer was: \(self.questionArray[self.currentQuestion].correctOption)"
+                        }
+                        //calculate & update score
+                    }, completion: {(finished: Bool) in
+                        if !(self.isLastQuestion()) {
+                            for index in 0..<self.labels.count{
+                                self.labels[index].isUserInteractionEnabled = true
                             }
-                        }, completion: nil)
-                        self.updateQuestion()
-                    }else{
-                        UIView.animate(withDuration: 3, animations: {
-                            if self.submittedAnswer == self.questionArray[self.currentQuestion].correctOption{
-                                self.timerLabel.text = "Correct"
-                            }else{
-                                self.timerLabel.text = "Correct answer is: \(self.questionArray[self.currentQuestion].correctOption)"
-                            }
-                        }, completion: nil)
-                        self.clockTimer.invalidate()
+                            self.updateQuestion()
+                        }else{
+                             self.timeSeconds = 1
+                        }
+                    })
+                }
+            }
+            
+            if let receivedInt = NSKeyedUnarchiver.unarchiveObject(with: data) as? Int{
+                for index in 0..<self.session.connectedPeers.count{
+                    if peerID == self.session.connectedPeers[index]{
+                        self.scores[index + 1].text = "\(receivedInt)"
                     }
                 }
             }
