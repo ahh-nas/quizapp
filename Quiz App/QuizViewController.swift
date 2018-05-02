@@ -22,6 +22,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     var peerID : MCPeerID!
     var labels = [UILabel]()
     var scores = [UILabel]()
+    var answers = [UILabel]()
     var clockTimer = Timer()
     var numOfSubmissions = 0
     var selectedAnswer = ""
@@ -47,13 +48,19 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     @IBOutlet weak var p3: UIImageView!
     @IBOutlet weak var p4: UIImageView!
     
-    //Player scores
+    //Player score labels
     @IBOutlet weak var p1s: UILabel!
     @IBOutlet weak var p2s: UILabel!
     @IBOutlet weak var p3s: UILabel!
     @IBOutlet weak var p4s: UILabel!
     
+    //player answer submission labels
+    @IBOutlet weak var p1a: UILabel!
+    @IBOutlet weak var p2a: UILabel!
+    @IBOutlet weak var p3a: UILabel!
+    @IBOutlet weak var p4a: UILabel!
     
+    @IBOutlet weak var playerWinStatus: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,6 +68,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         session.delegate = self
         labels = [ans_A, ans_B, ans_C, ans_D]
         scores = [p1s, p2s, p3s, p4s]
+        answers = [p1a, p2a, p3a, p4a]
         timerLabel.text = "\(timeSeconds)"
         
         for index in 0..<labels.count{
@@ -85,14 +93,16 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
             p4.isHidden = true
             p3s.isHidden = true
             p4s.isHidden = true
-            print()
+            p3a.isHidden = true
+            p4a.isHidden = true
+            //print()
         }
         
         if(numberOfPeers == 3)
         {
             p4.isHidden = true
             p4s.isHidden = true
-            
+            p4a.isHidden = true
         }
     }
     
@@ -171,8 +181,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
      
     @objc func selectAnswerTap(sender: UITapGestureRecognizer){
         let selection = sender.view as! UILabel
-        selectedAnswer = String(describing: selection.text?.first!).trimmingCharacters(in: .whitespaces)
-        print("selected answer: \(selectedAnswer)")
+        selectedAnswer = String(describing: selection.text!.first!).trimmingCharacters(in: .whitespaces)
+        print("selected answer 1: \(selectedAnswer)")
         for index in 0..<labels.count{
             if labels[index] == selection{
                 labels[index].backgroundColor = UIColor.blue
@@ -190,7 +200,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
             {
             let random = Int(arc4random_uniform(4))
             self.labels[random].backgroundColor = UIColor.blue
-                self.selectedAnswer = String(describing: labels[random].text?.first!).trimmingCharacters(in: .whitespaces)
+            self.selectedAnswer = String(describing: labels[random].text?.first!).trimmingCharacters(in: .whitespaces)
+                print("select ans 2: \(self.selectedAnswer)")
             shakeCounter = shakeCounter + 1
 
             
@@ -337,7 +348,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                 {
                     print("TURNED FOR SUBMISSION")
                     self.submittedAnswer = self.selectedAnswer
-                    print("submitted answer cmotion: \(self.submittedAnswer)")
+                    print("submitted answer cmotion 3: \(self.submittedAnswer)")
                     for index in 0..<self.labels.count
                     {
                         if String(describing: self.labels[index].text?.first!).trimmingCharacters(in: CharacterSet.whitespaces) == self.submittedAnswer                        {
@@ -387,23 +398,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     @objc func submitAnswerTap(sender: UITapGestureRecognizer){
         let selection = sender.view as! UILabel
         submittedAnswer = String(selection.text!.first!).trimmingCharacters(in: CharacterSet.whitespaces)
-//        if (submittedAnswer == "A")
-//        {
-//            zSubmission = "A"
-//        }
-//        if (submittedAnswer == "B")
-//        {
-//            zSubmission = "B"
-//        }
-//        if (submittedAnswer == "C")
-//        {
-//            zSubmission = "C"
-//        }
-//        if (submittedAnswer == "D")
-//        {
-//            zSubmission = "D"
-//        }
-        print("submitted answer tap: \(submittedAnswer)")
+
+        print("submitted answer tap 4: \(submittedAnswer)")
         for index in 0..<labels.count{
             if labels[index] == selection{
                 labels[index].backgroundColor = UIColor.green
@@ -468,7 +464,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         let options : [String: Any]
     }
     
-    func calculateScore(){//}, submissionTime: Int){
+    func calculateScore(){
         self.score += 1
         self.scores[0].text = "\(score)"
        
@@ -482,6 +478,35 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         }
     }
     
+    func showAnswer(){
+        self.answers[0].text = "\(submittedAnswer)"
+        // send score to other players
+        let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: submittedAnswer)
+        do{
+            try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
+        }
+        catch let err {
+            print("Error in sending data \(err)")
+        }
+    }
+    
+    
+    func showWinner(){
+        let maxscore = Int((scores.max{a, b in Int(a.text!)! < Int(b.text!)!}?.text!)!)!
+        if Int(p1s.text!)! == maxscore {
+            self.playerWinStatus.image = #imageLiteral(resourceName: "winner")
+        }else{
+             self.playerWinStatus.image = #imageLiteral(resourceName: "you_lose")
+        }
+//        let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: maxscore)
+//        do{
+//            try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
+//        }
+//        catch let err {
+//            print("Error in sending data \(err)")
+//        }
+    }
+    
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
     }
     
@@ -489,7 +514,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         DispatchQueue.main.async(execute: {
             if let receivedString = NSKeyedUnarchiver.unarchiveObject(with: data) as? String{
                 if receivedString == "submit" && peerID != self.peerID {
-                    print("other")
+                    //print("other")
                     self.numOfSubmissions += 1
                 }
                 if receivedString == "next" && peerID != self.peerID {
@@ -498,6 +523,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         if self.submittedAnswer == self.questionArray[self.currentQuestion].correctOption{
                             self.timerLabel.text = "Correct!"
                             self.calculateScore()
+                            self.showAnswer()
                             
                         }else{
                            self.timerLabel.text = "Answer was: \(self.questionArray[self.currentQuestion].correctOption)"
@@ -510,9 +536,18 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                             }
                             self.updateQuestion()
                         }else{
+                            self.showWinner()
                              self.timeSeconds = 1
                         }
                     })
+                }
+                 if receivedString == "A" || receivedString == "B" || receivedString == "C" || receivedString == "D" {
+                    for index in 0..<self.session.connectedPeers.count{
+                        if peerID == self.session.connectedPeers[index]{
+                            self.answers[index + 1].text = "\(self.submittedAnswer)"
+                        }
+                    }
+
                 }
             }
             

@@ -6,7 +6,7 @@
 //  Copyright © 2018 edu.self. All rights reserved.
 //
 
-/*import UIKit
+import UIKit
 import CoreMotion
 
 class singlePlayer: UIViewController {
@@ -60,6 +60,57 @@ class singlePlayer: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    /**
+     * Question objects
+     */
+    struct Question {
+        let number: Int
+        let correctOption : String
+        let questionSentence : String
+        let options : [String: Any]
+    }
+    
+    /**
+     * Selected answer is submitted and quiz moves to the next quesiton.
+     */
+    func submitAnswerTap(sender: UITapGestureRecognizer){
+        let selection = sender.view as! UILabel
+        print("submitted answer: \(String(describing: selection.text!))")
+        for index in 0..<labels.count{
+            if labels[index] == selection{
+                labels[index].backgroundColor = UIColor.green
+            }else{
+                labels[index].backgroundColor = UIColor.lightGray
+            }
+        }
+        
+        if selection.text == questionArray[currentQuestion].correctOption{
+            print("Correct!")
+        }else{
+            print("The correct answer is: \(questionArray[currentQuestion].correctOption)")
+        }
+        
+        timeSeconds = 21
+        updateQuestion()
+    }
+    
+    /**
+     * Game timer is updated.
+     */
+    func updateClock() {
+        if timeSeconds > 0 {
+            timeSeconds -= 1
+            timerLabel.text = "\(timeSeconds)"
+        }else{
+            // go to next question
+            if currentQuestion == questionArray.count - 1 {
+                clockTimer.invalidate()
+            }else {
+                timeSeconds = 20
+                updateQuestion()
+            }
+        }
+    }
     
     //this function is fetching the json from URL
     func getJsonFromUrl(){
@@ -86,7 +137,6 @@ class singlePlayer: UIViewController {
             let newQuestion = question(number: question["number"] as! Int, correctOption: question["correctOption"] as! String, questionSentence: question["questionSentence"] as! String, options: question["options"] as! [String: Any])
             questionArray.append(newQuestion)
         }
-        
     }
     
     
@@ -110,7 +160,7 @@ class singlePlayer: UIViewController {
     }
     
     
-        func selectAnswerTap(sender: UITapGestureRecognizer){
+    func selectAnswerTap(sender: UITapGestureRecognizer){
         let selection = sender.view as! UILabel
         print("selected answer: \(String(describing: selection.text!))")
         for index in 0..<labels.count{
@@ -161,10 +211,6 @@ class singlePlayer: UIViewController {
                     self.labels[3].backgroundColor = UIColor.blue
                 }
                 
-                
-                
-                
-                
             }
         }
     }
@@ -172,60 +218,9 @@ class singlePlayer: UIViewController {
     
     
     
-    /**
-     * Selected answer is submitted and quiz moves to the next quesiton.
-     */
-        func submitAnswerTap(sender: UITapGestureRecognizer){
-        let selection = sender.view as! UILabel
-        print("submitted answer: \(String(describing: selection.text!))")
-        for index in 0..<labels.count{
-            if labels[index] == selection{
-                labels[index].backgroundColor = UIColor.green
-            }else{
-                labels[index].backgroundColor = UIColor.lightGray
-            }
-        }
-        
-        //        clockTimer.invalidate()
-        if selection.text == questionArray[currentQuestion].correctOption{
-            print("Correct!")
-        }else{
-            print("The correct answer is: \(questionArray[currentQuestion].correctOption)")
-        }
-        //invalidate timer
-        //  check answer
-        // continue
-        timeSeconds = 21
-        updateQuestion()
-    }
+   
     
-    /**
-     * Game timer is updated.
-     */
-        func updateClock() {
-        if timeSeconds > 0 {
-            timeSeconds -= 1
-            timerLabel.text = "\(timeSeconds)"
-        }else{
-            // go to next question
-            if currentQuestion == questionArray.count - 1 {
-                clockTimer.invalidate()
-            }else {
-                timeSeconds = 20
-                updateQuestion()
-            }
-        }
-    }
-    
-    /**
-     * Question objects
-     */
-    struct Question {
-        let number: Int
-        let correctOption : String
-        let questionSentence : String
-        let options : [String: Any]
-    }
+   
     
     /*
      // MARK: - Navigation
@@ -239,4 +234,4 @@ class singlePlayer: UIViewController {
     
 }
 
-}*/
+}
