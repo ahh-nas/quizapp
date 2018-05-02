@@ -6,8 +6,10 @@
 //  Copyright © 2018 edu.self. All rights reserved.
 //
 
-/*import UIKit
+import UIKit
 import CoreMotion
+import Darwin
+
 
 class singlePlayer: UIViewController {
     
@@ -41,8 +43,8 @@ class singlePlayer: UIViewController {
         timerLabel.text = "\(timeSeconds)"
         scoreLabel.text = "\(score)"
         for index in 0..<labels.count{
-            // let selectTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.selectAnswerTap(sender:)))
-            //let submitTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.submitAnswerTap(sender:)))
+             let selectTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.selectAnswerTap(sender:)))
+            let submitTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.submitAnswerTap(sender:)))
             //  selectTapGesture.numberOfTapsRequired = 1
             submitTapGesture.numberOfTapsRequired = 2
             labels[index].isUserInteractionEnabled = true
@@ -52,7 +54,7 @@ class singlePlayer: UIViewController {
             labels[index].addGestureRecognizer(submitTapGesture)
         }
         
-        //clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateClock), userInfo: nil, repeats: true)
+        clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateClock), userInfo: nil, repeats: true)
         
         getJsonFromUrl()
         
@@ -143,7 +145,7 @@ class singlePlayer: UIViewController {
             // go to next question
             if isLastQuestion() {
                 clockTimer.invalidate()
-                // ask user to play again.
+                self.createAlert(title: "Thank You", message: "For playing our game :)")
             }else {
                 timeSeconds = 20
                 updateQuestion()
@@ -177,8 +179,8 @@ class singlePlayer: UIViewController {
     func parseDictionary(dictionary : [[String: Any]]){
         // for each element in dictionary create a question
         for question in dictionary{
-            //et newQuestion = question(number: question["number"] as! Int, correctOption: question["correctOption"] as! String, questionSentence: question["questionSentence"] as! String, options: question["options"] as! [String: Any])
-            //questionArray.append(newQuestion)
+            let newQuestion = Question(number: question["number"] as! Int, correctOption: question["correctOption"] as! String, questionSentence: question["questionSentence"] as! String, options: question["options"] as! [String: Any])
+            questionArray.append(newQuestion)
         }
     }
     
@@ -212,6 +214,15 @@ class singlePlayer: UIViewController {
                 }
             }
         }
+    }
+    func createAlert (title:String, message:String)
+    {
+        let alert = UIAlertController(title:title,message:message,preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title:"Thank You For Making This Wonderful App",style: UIAlertActionStyle.default, handler:{(action)in alert.dismiss(animated : true,completion : nil)
+            exit(0)
+        }))
+        
+        self.present(alert,animated: true, completion: nil)
     }
     
     var motionManger = CMMotionManager()
@@ -270,4 +281,4 @@ class singlePlayer: UIViewController {
     
 }
 
-}*/
+
