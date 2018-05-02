@@ -6,7 +6,7 @@
 //  Copyright © 2018 edu.self. All rights reserved.
 //
 
-import UIKit
+/*import UIKit
 import CoreMotion
 
 class singlePlayer: UIViewController {
@@ -39,7 +39,7 @@ class singlePlayer: UIViewController {
         timerLabel.text = "\(timeSeconds)"
         for index in 0..<labels.count{
             // let selectTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.selectAnswerTap(sender:)))
-            let submitTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.submitAnswerTap(sender:)))
+            //let submitTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.submitAnswerTap(sender:)))
             //  selectTapGesture.numberOfTapsRequired = 1
             submitTapGesture.numberOfTapsRequired = 2
             labels[index].isUserInteractionEnabled = true
@@ -49,7 +49,7 @@ class singlePlayer: UIViewController {
             labels[index].addGestureRecognizer(submitTapGesture)
         }
         
-        clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateClock), userInfo: nil, repeats: true)
+        //clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateClock), userInfo: nil, repeats: true)
         
         getJsonFromUrl()
         
@@ -134,8 +134,8 @@ class singlePlayer: UIViewController {
     func parseDictionary(dictionary : [[String: Any]]){
         // for each element in dictionary create a question
         for question in dictionary{
-            let newQuestion = question(number: question["number"] as! Int, correctOption: question["correctOption"] as! String, questionSentence: question["questionSentence"] as! String, options: question["options"] as! [String: Any])
-            questionArray.append(newQuestion)
+            //et newQuestion = question(number: question["number"] as! Int, correctOption: question["correctOption"] as! String, questionSentence: question["questionSentence"] as! String, options: question["options"] as! [String: Any])
+            //questionArray.append(newQuestion)
         }
     }
     
@@ -234,4 +234,4 @@ class singlePlayer: UIViewController {
     
 }
 
-}
+}*/

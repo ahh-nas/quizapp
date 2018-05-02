@@ -9,11 +9,12 @@
 import UIKit
 import CoreMotion
 import MultipeerConnectivity
+import Darwin
 
 class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessionDelegate {
     
     //the json file url
-    var QUIZ_URL = "http://www.people.vcu.edu/~ebulut/jsonFiles/quiz1.json"
+    var QUIZ_URL = ["http://www.people.vcu.edu/~ebulut/jsonFiles/quiz1.json","http://www.people.vcu.edu/~ebulut/jsonFiles/quiz2.json"]
     var questionArray = [Question]()
     var totalQuestions = 0
     var currentQuestion = -1
@@ -29,6 +30,8 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     var submittedAnswer = ""
     var score = 0
     var numberOfPeers = 0
+    var i = 0
+    
    
     // UI variables
     @IBOutlet weak var timerLabel: UILabel!
@@ -115,7 +118,21 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
      * Reads the json file from a url.
      */
     func getJsonFromUrl(){
-    let url = URL(string: QUIZ_URL)
+        var url = URL(string: QUIZ_URL[0])
+        if (i == 0)
+        {
+            url = URL(string: QUIZ_URL[0])
+        }
+        if (i == 1)
+        {
+            url = URL(string: QUIZ_URL[1])
+        }
+        if (i == 2)
+        {
+            i = 0
+        }
+       
+        
        
     URLSession.shared.dataTask(with:url!, completionHandler: {(data, response, error) in
         guard let data = data, error == nil else { return }
@@ -130,6 +147,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
             print(error)
         }
     }).resume()
+        
     }
     
     /**
@@ -349,8 +367,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                 self.motionManger.startAccelerometerUpdates(to: OperationQueue.current!){(data,error)in
                  if let myAData = data{
                     if (myData.rotationRate.z > 3 || myData.rotationRate.z < -3 || myAData.acceleration.z > -0.5)
-                {   print(myAData)
-                    print("TURNED FOR SUBMISSION")
+                {
                     self.submittedAnswer = self.selectedAnswer
                     print("submitted answer cmotion 3: \(self.submittedAnswer)")
                     for index in 0..<self.labels.count
@@ -496,13 +513,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         }else{
              self.playerWinStatus.image = #imageLiteral(resourceName: "you_lose")
         }
-//        let dataToSend =  NSKeyedArchiver.archivedData(withRootObject: maxscore)
-//        do{
-//            try session.send(dataToSend, toPeers: session.connectedPeers, with: .reliable)
-//        }
-//        catch let err {
-//            print("Error in sending data \(err)")
-//        }
+
     }
     
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
@@ -534,6 +545,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         }else{
                             self.showWinner()
                              self.timeSeconds = 1
+                            self.createAlert(title: "Having Fun?", message: "Would you like to play another game?")
                         }
                     })
                 }
@@ -557,6 +569,18 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
         })
     }
     
+    func createAlert (title:String, message:String)
+    {
+        let alert = UIAlertController(title:title,message:message,preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title:"Yes",style: UIAlertActionStyle.default, handler:{(action)in alert.dismiss(animated : true,completion : nil)
+            self.i = self.i + 1
+            self.viewDidLoad()
+        }))
+        alert.addAction(UIAlertAction(title:"No",style: UIAlertActionStyle.default, handler:{(action)in alert.dismiss(animated : true,completion : nil)
+            exit(0)
+        }))
+        self.present(alert,animated: true, completion: nil)
+    }
     
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
     }
