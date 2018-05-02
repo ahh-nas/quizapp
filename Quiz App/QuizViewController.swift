@@ -151,7 +151,9 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
      */
     func updateQuestion(){
         timeSeconds = 21
-        
+        for index in 0..<self.labels.count{
+            self.labels[index].isUserInteractionEnabled = true
+        }
         if currentQuestion < questionArray.count - 1 {
             currentQuestion += 1
             DispatchQueue.main.async {
@@ -343,15 +345,17 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         print("TURNED -yD \(self.selectedAnswer)")
                     }
                 }
-                
-                if (myData.rotationRate.z > 3 || myData.rotationRate.z < -3)
-                {
+                self.motionManger.accelerometerUpdateInterval = 0.25
+                self.motionManger.startAccelerometerUpdates(to: OperationQueue.current!){(data,error)in
+                 if let myAData = data{
+                    if (myData.rotationRate.z > 3 || myData.rotationRate.z < -3 || myAData.acceleration.z > -0.5)
+                {   print(myAData)
                     print("TURNED FOR SUBMISSION")
                     self.submittedAnswer = self.selectedAnswer
                     print("submitted answer cmotion 3: \(self.submittedAnswer)")
                     for index in 0..<self.labels.count
                     {
-                        if String(describing: self.labels[index].text?.first!).trimmingCharacters(in: CharacterSet.whitespaces) == self.submittedAnswer                        {
+                        if String(describing: self.labels[index].text?.first!).trimmingCharacters(in: CharacterSet.whitespaces) == self.submittedAnswer {
                             self.labels[index].backgroundColor = UIColor.green
                         }
                         else{
@@ -373,20 +377,13 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         print("Error in sending data \(err)")
                     }
                 }
+                }
+            }
+                
             }
             
         }
         
-       /* let headingManger = CMMotionManager()
-        
-        headingManger.magnetometerUpdateInterval = 1
-        headingManger.startMagnetometerUpdates(to: OperationQueue.current!) { (data,error) in
-            if let mData = data
-            {
-                mData.magneticField
-                print(mData)
-            }
-        }*/
     }
    
     
@@ -398,6 +395,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
     @objc func submitAnswerTap(sender: UITapGestureRecognizer){
         let selection = sender.view as! UILabel
         submittedAnswer = String(selection.text!.first!).trimmingCharacters(in: CharacterSet.whitespaces)
+
 
         print("submitted answer tap 4: \(submittedAnswer)")
         for index in 0..<labels.count{
@@ -531,9 +529,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
                         //calculate & update score
                     }, completion: {(finished: Bool) in
                         if !(self.isLastQuestion()) {
-                            for index in 0..<self.labels.count{
-                                self.labels[index].isUserInteractionEnabled = true
-                            }
+                            
                             self.updateQuestion()
                         }else{
                             self.showWinner()
