@@ -381,9 +381,7 @@ class QuizViewController: UIViewController, UIGestureRecognizerDelegate, MCSessi
             }
                 
             }
-            
         }
-        
     }
    
     
